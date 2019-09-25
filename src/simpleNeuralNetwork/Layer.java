@@ -1,5 +1,7 @@
 package simpleNeuralNetwork;
 
-public class Layer {
+import java.util.List;
 
+public class Layer {
+	private List<Neuron> neurons;
 }

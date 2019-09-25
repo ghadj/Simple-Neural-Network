@@ -1,5 +1,9 @@
 package simpleNeuralNetwork;
 
-public class Neuron {
+import java.util.List;
 
+public class Neuron {
+	private List<Synapse> synapsesIn;
+	private List<Synapse> synapsesOut;
+	
 }
