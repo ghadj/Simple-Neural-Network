@@ -5,12 +5,12 @@ import java.util.Random;
 public class Synapse {
 	private double weight;
 	private double previousWeight;
-	private Neuron neuronIn;
-	private Neuron NeuronOut;
+	private Neuron neuronFrom;
+	private Neuron NeuronTo;
 	
-	public Synapse(Neuron neuronIn, Neuron neuronOut) {
-		this.neuronIn = neuronIn;
-		this.NeuronOut = neuronOut;
+	public Synapse(Neuron neuronFrom, Neuron NeuronTo) {
+		this.neuronFrom = neuronFrom;
+		this.NeuronTo = NeuronTo;
 		this.weight = (new Random()).nextDouble() - 0.5; // initialize weight to a random number [-0.5, 0.5]
 		this.previousWeight = this.weight;
 	}
@@ -31,11 +31,11 @@ public class Synapse {
 		this.previousWeight = previousWeight;
 	}
 
-	public Neuron getNeuronIn() {
-		return neuronIn;
+	public Neuron getNeuronFrom() {
+		return neuronFrom;
 	}
 
-	public Neuron getNeuronOut() {
-		return NeuronOut;
+	public Neuron getNeuronTo() {
+		return NeuronTo;
 	}
 }

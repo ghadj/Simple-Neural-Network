@@ -1,22 +1,70 @@
 package io.github.ghadj.simpleneuralnetwork;
 
 import java.util.*;
-
+/*
+ * @TODO define input and bias neurons and use instance of 
+ */
 public class Neuron {
 	private List<Synapse> synapsesIn = new ArrayList<Synapse>();
 	private List<Synapse> synapsesOut = new ArrayList<Synapse>();
-	private static final double sigmoidSlope = 1;
+	private double errorSignal = 0; // δ
+	private Boolean isInput = false;
+	private Boolean isBias = false;
+	private double output;
+
+	public Neuron(double output, Boolean isBias) {
+		this.isInput = !isBias;
+		this.isBias = isBias;
+		this.output = output;
+	}
 
 	private static double sigmoidFunction(double x) {
-		return 1 / (1 + Math.exp(-(sigmoidSlope * x)));
+		return 1 / (1 + Math.exp(-(NeuralNetwork.SIGMOID_SLOPE * x)));
+	}
+
+	public void activate() {
+		if (isInput || isBias)
+			return;
+		double dotProduct = 0;
+		for (Synapse s : synapsesIn) {
+			dotProduct += s.getNeuronFrom().getOutput() * s.getWeight();
+		}
+		output = sigmoidFunction(dotProduct);
 	}
 
 	public double getOutput() {
-		double dotProduct = 0;
-		for (Synapse s : synapsesIn) {
-			dotProduct += s.getNeuronIn().getOutput()*s.getWeight();
-		}
-		return sigmoidFunction(dotProduct);
+		return output;
 	}
 
+	public Boolean getIsInputNeuron(){
+		return isInput;
+	}
+
+	public Boolean getIsBiasNeuron(){
+		return isBias;
+	}
+
+	public void addSynapseIn(Synapse s){
+		synapsesIn.add(s);
+	}
+
+	public List<Synapse> getSynapseIn(){
+		return this.synapsesIn;
+	}
+
+	public void addSynapseOut(Synapse s){
+		synapsesOut.add(s);
+	}
+
+	public List<Synapse> getSynapseOut(){
+		return this.synapsesOut;
+	}
+
+	public double getErrorSignal() {
+		return errorSignal;
+	}
+
+	public void setErrorSignal(double errorSignal) {
+		this.errorSignal = errorSignal;
+	}
 }
