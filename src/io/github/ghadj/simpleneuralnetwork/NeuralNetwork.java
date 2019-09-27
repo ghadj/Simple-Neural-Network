@@ -19,14 +19,19 @@ public class NeuralNetwork {
 
     // @TODO
     public void setInputs(ArrayList<Double> inputs) {
-        // instanceof InputNeuron
+        int i = 0; // input index
+        List<Neuron> inputNeurons = layers.get(0).getNeurons();
+        for (Neuron n : inputNeurons) {
+            if (n instanceof InputNeuron)
+                n.setOutput(inputs.get(i++));
+        }
     }
 
-    // @TODO check for computational neurons
     public void forwardpropagation() {
         for (Layer l : layers)
             for (Neuron n : l.getNeurons())
-                ((ComputationalNeuron) n).activate();
+                if (n instanceof ComputationalNeuron)
+                    ((ComputationalNeuron) n).activate();
     }
 
     // δ for output layer neurons
@@ -46,11 +51,13 @@ public class NeuralNetwork {
     }
 
     private void changeWeight(Synapse s) {
+        double currentWeight = s.getWeight();
         s.setWeight(
                 s.getWeight()
                         + LEARNING_RATE * ((ComputationalNeuron) s.getNeuronTo()).getErrorSignal()
                                 * s.getNeuronFrom().getOutput()
                         + MOMENTUM_FACTOR * (s.getWeight() - s.getPreviousWeight()));
+        s.setPreviousWeight(currentWeight);
     }
 
     public void backpropagation(ArrayList<Double> target) {

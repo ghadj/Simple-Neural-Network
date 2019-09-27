@@ -28,6 +28,10 @@ public class Layer {
 		return neurons;
 	}
 
+	public int getSize(){
+		return neurons.size();
+	}
+
 	/*
 	 * public Layer getNextLayer(){ return nextLayer; }
 	 * 
