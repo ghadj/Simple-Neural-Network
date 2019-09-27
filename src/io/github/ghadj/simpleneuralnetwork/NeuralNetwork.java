@@ -16,31 +16,35 @@ public class NeuralNetwork {
     public void addLayer(Layer l) {
         layers.add(l);
     }
-
-    public void feedforward() {
+    // @TODO
+    public void setInputs(ArrayList<Double> inputs){
+        // instanceof InputNeuron
+    }
+    // @TODO check for computational neurons 
+    public void forwardpropagation() {
         for (Layer l : layers)
             for (Neuron n : l.getNeurons())
-                n.activate();
+            ((ComputationalNeuron) n).activate();
     }
 
     // δ for output layer neurons
     private void calculateErrorSignal(Neuron n, double target) {
         double errorSignal = SIGMOID_SLOPE * n.getOutput() * (1 - n.getOutput()) * (target - n.getOutput());
-        n.setErrorSignal(errorSignal);
+        ((ComputationalNeuron) n).setErrorSignal(errorSignal);
     }
 
     private void calculateErrorSignal(Neuron n) {
         double sum = 0;
         // Σ δpk*wp
         for (Synapse s : n.getSynapseOut())
-            sum += s.getWeight() * s.getNeuronTo().getErrorSignal();
+            sum += s.getWeight() * ((ComputationalNeuron)s.getNeuronTo()).getErrorSignal();
 
         double errorSignal = SIGMOID_SLOPE * n.getOutput() * (1 - n.getOutput()) * sum;
-        n.setErrorSignal(errorSignal);
+        ((ComputationalNeuron) n).setErrorSignal(errorSignal);
     }
 
     private void changeWeight(Synapse s) {
-        s.setWeight(s.getWeight() + LEARNING_RATE * s.getNeuronTo().getErrorSignal() * s.getNeuronFrom().getOutput()
+        s.setWeight(s.getWeight() + LEARNING_RATE * ((ComputationalNeuron)s.getNeuronTo()).getErrorSignal() * s.getNeuronFrom().getOutput()
                 + MOMENTUM_FACTOR * (s.getWeight() - s.getPreviousWeight()));
     }
 
