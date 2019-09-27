@@ -8,22 +8,36 @@ public class NeuralNetwork {
     private final double LEARNING_RATE;
     private List<Layer> layers = new ArrayList<Layer>();
 
-    public NeuralNetwork(List<Integer> numNeuronsPerLayer, double learningRate, double momentumFactor) {
+    public NeuralNetwork(int numInputNeurons, int numOutputNeurons, List<Integer> numNeuronsPerHiddenLayer,
+            double learningRate, double momentumFactor) throws IllegalArgumentException {
         this.MOMENTUM_FACTOR = momentumFactor;
         this.LEARNING_RATE = learningRate;
 
-        if (numNeuronsPerLayer == null || numNeuronsPerLayer.isEmpty())
-            return;
-            
+        if (numInputNeurons <= 0 || numOutputNeurons <= 0)
+            throw new IllegalArgumentException("Number of Input and Output neurons MUST be positive");
+
         // build the neural network
-        for (int i = 0; i < numNeuronsPerLayer.size(); i++) {
-            Layer l = new Layer(i == 0 ? null : layers.get(i - 1));
+        Layer inputLayer = new Layer(null);
+        inputLayer.addNeuron(new BiasNeuron());
+        for (int i = 0; i < numInputNeurons; i++)
+            inputLayer.addNeuron(new InputNeuron());
+        this.addLayer(inputLayer);
+
+        for (int i = 0; i < numNeuronsPerHiddenLayer.size(); i++) {
+            if (numNeuronsPerHiddenLayer.get(i) <= 0)
+                continue;
+            Layer l = new Layer(layers.get(layers.size() - 1));
             l.addNeuron(new BiasNeuron());
-            for (int j = 0; j < numNeuronsPerLayer.get(i); j++)
-                l.addNeuron(i == 0 ? new InputNeuron() : new Neuron());
-            if (l.getSize() > 0)
-                this.addLayer(l);
+            for (int j = 0; j < numNeuronsPerHiddenLayer.get(i); j++)
+                l.addNeuron(new ComputationalNeuron());
+            this.addLayer(l);
         }
+
+        Layer outputLayer = new Layer(null);
+        for (int i = 0; i < numOutputNeurons; i++)
+            outputLayer.addNeuron(new InputNeuron());
+        this.addLayer(outputLayer);
+
     }
 
     public void addLayer(Layer l) {
@@ -98,5 +112,21 @@ public class NeuralNetwork {
             sum += Math.pow(target.get(i) - lastLayerNeurons.get(i).getOutput(), 2);
         }
         return 0.5 * sum;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("\nNeural Network Info\n");
+        s.append("==========================\n");
+        s.append("Layer #\tNumber of Neurons\n");
+        for (Layer l : layers)
+            s.append(layers.indexOf(l) + "\t" + l.getSize() + "\n");
+        return s.toString();
+    }
+
+    public static void main(String args[]) {
+        Integer[] n = { 2, 1, 1, 4};
+        NeuralNetwork nn = new NeuralNetwork(2, 1, Arrays.asList(n), 0.3, 0.3);
+        System.out.println(nn);
     }
 }

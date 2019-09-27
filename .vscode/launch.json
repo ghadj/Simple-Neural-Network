@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - NeuralNetwork",
+            "request": "launch",
+            "mainClass": "io.github.ghadj.simpleneuralnetwork.NeuralNetwork",
+            "projectName": "Simple-Neural-Network"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - SimpleNeuralNetworkDriver",
             "request": "launch",
             "mainClass": "io.github.ghadj.simpleneuralnetwork.SimpleNeuralNetworkDriver",
