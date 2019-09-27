@@ -151,15 +151,19 @@ public class NeuralNetwork {
         return s.toString();
     }
 
-    public static void main(String args[]) {
-        Integer[] n = { 2, 1, 1, 4 };
-        NeuralNetwork nn = new NeuralNetwork(2, 1, Arrays.asList(n), 0.3, 0.3);
-        System.out.println(nn);
+	public ArrayList<Double> getTrainErrorList() {
+		return trainErrorList;
+	}
 
-        nn.forwardpropagation();
-        System.out.println(nn.layers.get(nn.layers.size() - 1).getNeurons().get(0).getOutput());
-        Double[] t = { 1.3 };
-        nn.backpropagation(Arrays.asList(t));
-        System.out.println(nn.getError(Arrays.asList(t)));
-    }
+	public ArrayList<Double> getTrainSuccessRare() {
+		return trainSuccessRare;
+	}
+
+	public ArrayList<Double> getTestErrorList() {
+		return testErrorList;
+	}
+
+	public ArrayList<Double> getTestSuccessRate() {
+		return testSuccessRate;
+	}
 }

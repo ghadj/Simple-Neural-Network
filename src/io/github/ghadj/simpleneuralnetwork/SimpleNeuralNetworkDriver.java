@@ -61,6 +61,7 @@ public class SimpleNeuralNetworkDriver {
 			nn.run(trainingData, true);
 			nn.run(testData, false);
 		}
+		// @TODO get error and success rate and create txt files
 	}
 
 	public static void main(String[] args) {
