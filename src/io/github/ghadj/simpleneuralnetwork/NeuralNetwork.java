@@ -7,6 +7,10 @@ public class NeuralNetwork {
     private final double MOMENTUM_FACTOR;
     private final double LEARNING_RATE;
     private List<Layer> layers = new ArrayList<Layer>();
+    private ArrayList<Double> trainErrorList = new ArrayList<Double>();
+    private ArrayList<Double> trainSuccessRare = new ArrayList<Double>();
+    private ArrayList<Double> testErrorList = new ArrayList<Double>();
+    private ArrayList<Double> testSuccessRate = new ArrayList<Double>();
 
     public NeuralNetwork(int numInputNeurons, int numOutputNeurons, List<Integer> numNeuronsPerHiddenLayer,
             double learningRate, double momentumFactor) throws IllegalArgumentException {
@@ -21,7 +25,7 @@ public class NeuralNetwork {
         inputLayer.addNeuron(new BiasNeuron());
         for (int i = 0; i < numInputNeurons; i++)
             inputLayer.addNeuron(new InputNeuron());
-        this.addLayer(inputLayer);
+        layers.add(inputLayer);
 
         for (int i = 0; i < numNeuronsPerHiddenLayer.size(); i++) {
             if (numNeuronsPerHiddenLayer.get(i) <= 0)
@@ -30,21 +34,36 @@ public class NeuralNetwork {
             hiddenLayer.addNeuron(new BiasNeuron());
             for (int j = 0; j < numNeuronsPerHiddenLayer.get(i); j++)
                 hiddenLayer.addNeuron(new ComputationalNeuron());
-            this.addLayer(hiddenLayer);
+            layers.add(hiddenLayer);
         }
 
         Layer outputLayer = new Layer(layers.get(layers.size() - 1));
         for (int i = 0; i < numOutputNeurons; i++)
             outputLayer.addNeuron(new ComputationalNeuron());
-        this.addLayer(outputLayer);
-
+        layers.add(outputLayer);
     }
 
-    public void addLayer(Layer l) {
-        layers.add(l);
+    public void run(Map<List<Double>, List<Double>> data, Boolean train) {
+        double sumError = 0.0;
+        double sumSuccessRate = 0.0;
+        for (Map.Entry<List<Double>, List<Double>> t : data.entrySet()) {
+            setInputs(t.getKey());
+            forwardpropagation();
+            sumError += getError(t.getValue());
+            sumSuccessRate += getSuccessRate(t.getValue());
+            if (train)
+                backpropagation(t.getValue());
+        }
+        if (train) {
+            trainErrorList.add(sumError / data.size());
+            trainSuccessRare.add(sumSuccessRate / data.size());
+        } else {
+            testErrorList.add(sumError / data.size());
+            testSuccessRate.add(sumSuccessRate / data.size());
+        }
     }
 
-    public void setInputs(List<Double> inputs) {
+    private void setInputs(List<Double> inputs) {
         int i = 0; // input index
         List<Neuron> inputNeurons = layers.get(0).getNeurons(); // assume only first layer has input units
         for (Neuron n : inputNeurons)
@@ -52,7 +71,7 @@ public class NeuralNetwork {
                 n.setOutput(inputs.get(i++));
     }
 
-    public void forwardpropagation() {
+    private void forwardpropagation() {
         for (Layer l : layers)
             for (Neuron n : l.getNeurons())
                 if (n instanceof ComputationalNeuron)
@@ -85,7 +104,7 @@ public class NeuralNetwork {
         s.setPreviousWeight(currentWeight);
     }
 
-    public void backpropagation(List<Double> target) {
+    private void backpropagation(List<Double> target) {
         // start from the last layer
         for (int i = layers.size() - 1; i >= 0; i--) {
             Layer l = layers.get(i);
@@ -103,13 +122,23 @@ public class NeuralNetwork {
         }
     }
 
-    public double getError(List<Double> target) {
+    private double getError(List<Double> target) {
         double sum = 0.0;
         List<Neuron> lastLayerNeurons = layers.get(layers.size() - 1).getNeurons();
         for (int i = 0; i < lastLayerNeurons.size(); i++)
             // Σ(target - actual output)^2
             sum += Math.pow(target.get(i) - lastLayerNeurons.get(i).getOutput(), 2);
         return 0.5 * sum;
+    }
+
+    private double getSuccessRate(List<Double> target) {
+        double success = 0;
+        List<Neuron> lastLayerNeurons = layers.get(layers.size() - 1).getNeurons();
+        for (int i = 0; i < lastLayerNeurons.size(); i++)
+            if ((lastLayerNeurons.get(i).getOutput() >= 0.5 && target.get(i) == 1)
+                    || (lastLayerNeurons.get(i).getOutput() < 0.5 && target.get(i) == 0))
+                success++;
+        return success / target.size();
     }
 
     @Override
