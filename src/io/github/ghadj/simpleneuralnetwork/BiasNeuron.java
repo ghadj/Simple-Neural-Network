@@ -1,7 +1,7 @@
 package io.github.ghadj.simpleneuralnetwork;
 
 public class BiasNeuron extends Neuron{
-    public BiasNeuron(double output) {
+    public BiasNeuron() {
 		super.setOutput(-1);
     }
 
