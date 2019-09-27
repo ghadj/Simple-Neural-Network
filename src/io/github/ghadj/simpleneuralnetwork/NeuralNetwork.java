@@ -125,8 +125,10 @@ public class NeuralNetwork {
     }
 
     public static void main(String args[]) {
-        Integer[] n = { 2, 1, 1, 4};
+        Integer[] n = { 2, 1, 1, 4 };
         NeuralNetwork nn = new NeuralNetwork(2, 1, Arrays.asList(n), 0.3, 0.3);
         System.out.println(nn);
+        System.out.println(nn.layers.get(3).getNeurons().get(1).getSynapseIn());
+
     }
 }
