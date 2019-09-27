@@ -8,23 +8,13 @@ public class Neuron {
 	private List<Synapse> synapsesIn = new ArrayList<Synapse>();
 	private List<Synapse> synapsesOut = new ArrayList<Synapse>();
 	private double errorSignal = 0; // δ
-	private Boolean isInput = false;
-	private Boolean isBias = false;
 	private double output;
-
-	public Neuron(double output, Boolean isBias) {
-		this.isInput = !isBias;
-		this.isBias = isBias;
-		this.output = output;
-	}
 
 	private static double sigmoidFunction(double x) {
 		return 1 / (1 + Math.exp(-(NeuralNetwork.SIGMOID_SLOPE * x)));
 	}
 
 	public void activate() {
-		if (isInput || isBias)
-			return;
 		double dotProduct = 0;
 		for (Synapse s : synapsesIn) {
 			dotProduct += s.getNeuronFrom().getOutput() * s.getWeight();
@@ -36,12 +26,8 @@ public class Neuron {
 		return output;
 	}
 
-	public Boolean getIsInputNeuron(){
-		return isInput;
-	}
-
-	public Boolean getIsBiasNeuron(){
-		return isBias;
+	public void setOutput(double output) {
+		this.output = output;
 	}
 
 	public void addSynapseIn(Synapse s){

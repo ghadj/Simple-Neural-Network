@@ -15,7 +15,7 @@ public class Layer {
 
 	public void addNeuron(Neuron n){
 		neurons.add(n);
-		if(this.previousLayer != null && !n.getIsInputNeuron() && !n.getIsBiasNeuron()){
+		if(this.previousLayer != null && !(n instanceof InputNeuron) && !(n instanceof BiasNeuron)){
 			for(Neuron p : this.previousLayer.getNeurons()){
 				Synapse s = new Synapse(p, n);
 				p.addSynapseOut(s);
