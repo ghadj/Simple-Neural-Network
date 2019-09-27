@@ -1,7 +1,5 @@
 package io.github.ghadj.simpleneuralnetwork;
 
-import java.util.*;
-
 public class ComputationalNeuron extends Neuron {
     private double errorSignal = 0; // δ
 
