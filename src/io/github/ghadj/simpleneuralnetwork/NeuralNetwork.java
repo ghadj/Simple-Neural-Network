@@ -26,16 +26,16 @@ public class NeuralNetwork {
         for (int i = 0; i < numNeuronsPerHiddenLayer.size(); i++) {
             if (numNeuronsPerHiddenLayer.get(i) <= 0)
                 continue;
-            Layer l = new Layer(layers.get(layers.size() - 1));
-            l.addNeuron(new BiasNeuron());
+            Layer hiddenLayer = new Layer(layers.get(layers.size() - 1));
+            hiddenLayer.addNeuron(new BiasNeuron());
             for (int j = 0; j < numNeuronsPerHiddenLayer.get(i); j++)
-                l.addNeuron(new ComputationalNeuron());
-            this.addLayer(l);
+                hiddenLayer.addNeuron(new ComputationalNeuron());
+            this.addLayer(hiddenLayer);
         }
 
-        Layer outputLayer = new Layer(null);
+        Layer outputLayer = new Layer(layers.get(layers.size() - 1));
         for (int i = 0; i < numOutputNeurons; i++)
-            outputLayer.addNeuron(new InputNeuron());
+            outputLayer.addNeuron(new ComputationalNeuron());
         this.addLayer(outputLayer);
 
     }
@@ -44,13 +44,12 @@ public class NeuralNetwork {
         layers.add(l);
     }
 
-    public void setInputs(ArrayList<Double> inputs) {
+    public void setInputs(List<Double> inputs) {
         int i = 0; // input index
         List<Neuron> inputNeurons = layers.get(0).getNeurons(); // assume only first layer has input units
-        for (Neuron n : inputNeurons) {
+        for (Neuron n : inputNeurons)
             if (n instanceof InputNeuron)
                 n.setOutput(inputs.get(i++));
-        }
     }
 
     public void forwardpropagation() {
@@ -69,7 +68,7 @@ public class NeuralNetwork {
     private void calculateErrorSignal(ComputationalNeuron n) {
         double sum = 0;
         // Σ δpk*wp
-        for (Synapse s : n.getSynapseOut())
+        for (Synapse s : n.getSynapsesOut())
             sum += s.getWeight() * ((ComputationalNeuron) s.getNeuronTo()).getErrorSignal();
 
         double errorSignal = SIGMOID_SLOPE * n.getOutput() * (1 - n.getOutput()) * sum;
@@ -86,7 +85,7 @@ public class NeuralNetwork {
         s.setPreviousWeight(currentWeight);
     }
 
-    public void backpropagation(ArrayList<Double> target) {
+    public void backpropagation(List<Double> target) {
         // start from the last layer
         for (int i = layers.size() - 1; i >= 0; i--) {
             Layer l = layers.get(i);
@@ -94,23 +93,22 @@ public class NeuralNetwork {
                 if (!(n instanceof ComputationalNeuron)) // ignore input/bias units
                     continue;
                 if (i == layers.size() - 1) // output layer
-                    calculateErrorSignal((ComputationalNeuron) n, target.get(i));
+                    calculateErrorSignal((ComputationalNeuron) n, target.get(l.getNeurons().indexOf(n)));
                 else // hidden layer
                     calculateErrorSignal((ComputationalNeuron) n);
 
-                for (Synapse s : n.getSynapseIn())
+                for (Synapse s : n.getSynapsesIn())
                     changeWeight(s);
             }
         }
     }
 
-    public double getError(ArrayList<Double> target) {
-        double sum = 0;
+    public double getError(List<Double> target) {
+        double sum = 0.0;
         List<Neuron> lastLayerNeurons = layers.get(layers.size() - 1).getNeurons();
-        for (int i = 0; i < lastLayerNeurons.size() - 1; i++) {
+        for (int i = 0; i < lastLayerNeurons.size(); i++)
             // Σ(target - actual output)^2
             sum += Math.pow(target.get(i) - lastLayerNeurons.get(i).getOutput(), 2);
-        }
         return 0.5 * sum;
     }
 
@@ -128,7 +126,11 @@ public class NeuralNetwork {
         Integer[] n = { 2, 1, 1, 4 };
         NeuralNetwork nn = new NeuralNetwork(2, 1, Arrays.asList(n), 0.3, 0.3);
         System.out.println(nn);
-        System.out.println(nn.layers.get(3).getNeurons().get(1).getSynapseIn());
 
+        nn.forwardpropagation();
+        System.out.println(nn.layers.get(nn.layers.size() - 1).getNeurons().get(0).getOutput());
+        Double[] t = { 1.3 };
+        nn.backpropagation(Arrays.asList(t));
+        System.out.println(nn.getError(Arrays.asList(t)));
     }
 }

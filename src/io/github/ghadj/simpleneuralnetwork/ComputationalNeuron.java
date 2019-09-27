@@ -9,7 +9,7 @@ public class ComputationalNeuron extends Neuron {
 
     public void activate() {
         double dotProduct = 0;
-        for (Synapse s : super.getSynapseIn()) {
+        for (Synapse s : super.getSynapsesIn()) {
             dotProduct += s.getNeuronFrom().getOutput() * s.getWeight();
         }
         super.setOutput(sigmoidFunction(dotProduct));

@@ -11,14 +11,13 @@ public class Layer {
 	}
 
 	public void addNeuron(Neuron n) {
-		neurons.add(n);
-		if (this.previousLayer != null && !(n instanceof InputNeuron) && !(n instanceof BiasNeuron)) {
+		this.neurons.add(n);
+		if (this.previousLayer != null && n instanceof ComputationalNeuron)
 			for (Neuron p : this.previousLayer.getNeurons()) {
 				Synapse s = new Synapse(p, n);
 				p.addSynapseOut(s);
 				n.addSynapseIn(s);
 			}
-		}
 	}
 
 	public List<Neuron> getNeurons() {

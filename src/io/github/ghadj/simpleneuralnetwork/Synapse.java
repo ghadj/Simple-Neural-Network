@@ -7,7 +7,7 @@ public class Synapse {
 	private double previousWeight;
 	private Neuron neuronFrom;
 	private Neuron NeuronTo;
-	
+
 	public Synapse(Neuron neuronFrom, Neuron NeuronTo) {
 		this.neuronFrom = neuronFrom;
 		this.NeuronTo = NeuronTo;

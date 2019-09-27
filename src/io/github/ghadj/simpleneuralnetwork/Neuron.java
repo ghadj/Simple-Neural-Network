@@ -5,7 +5,7 @@ import java.util.*;
 public class Neuron {
 	private List<Synapse> synapsesIn = new ArrayList<Synapse>();
 	private List<Synapse> synapsesOut = new ArrayList<Synapse>();
-	private double output;
+	private double output = 0.0;
 
 	public double getOutput() {
 		return output;
@@ -19,7 +19,7 @@ public class Neuron {
 		synapsesIn.add(s);
 	}
 
-	public List<Synapse> getSynapseIn() {
+	public List<Synapse> getSynapsesIn() {
 		return this.synapsesIn;
 	}
 
@@ -27,7 +27,7 @@ public class Neuron {
 		synapsesOut.add(s);
 	}
 
-	public List<Synapse> getSynapseOut() {
+	public List<Synapse> getSynapsesOut() {
 		return this.synapsesOut;
 	}
 }
