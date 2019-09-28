@@ -5,6 +5,9 @@ import java.util.*;
 import java.security.InvalidParameterException;
 
 public class SimpleNeuralNetworkDriver {
+	private static final String errorFilename = "errors.txt";
+	private static final String successRateFilename = "successrate.txt";
+
 	public static String[] readParameters(String filename)
 			throws FileNotFoundException, IOException, InvalidParameterException {
 		File file = new File(filename);
@@ -52,16 +55,31 @@ public class SimpleNeuralNetworkDriver {
 	}
 
 	public static void run(String[] parameters, Map<List<Double>, List<Double>> trainingData,
-			Map<List<Double>, List<Double>> testData) {
+			Map<List<Double>, List<Double>> testData) throws IOException {
 		Integer[] hiddenLayerNeurons = { Integer.parseInt(parameters[0]), Integer.parseInt(parameters[1]) };
 		NeuralNetwork nn = new NeuralNetwork(Integer.parseInt(parameters[2]), Integer.parseInt(parameters[3]),
 				Arrays.asList(hiddenLayerNeurons), Double.parseDouble(parameters[4]),
 				Double.parseDouble(parameters[5]));
-		for(int i = 0;i<Integer.parseInt(parameters[6]); i++){
+		for (int i = 0; i < Integer.parseInt(parameters[6]); i++) {
 			nn.run(trainingData, true);
 			nn.run(testData, false);
 		}
 		List<Double> trainError = nn.getTrainErrorList();
+		List<Double> testError = nn.getTestErrorList();
+		writeResults(trainError, testError, errorFilename);
+
+		List<Double> trainSuccessRate = nn.getTrainSuccessRare();
+		List<Double> testSuccessRate = nn.getTestSuccessRate();
+		writeResults(trainSuccessRate, testSuccessRate, successRateFilename);
+	}
+
+	public static void writeResults(List<Double> trainData, List<Double> testData, String filename) throws IOException {
+		Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename), "utf-8"));
+		StringBuilder str = new StringBuilder();
+		for (int i = 0; i < trainData.size() && i < testData.size(); i++)
+			str.append((i + 1) + "," + trainData.get(i) + "," + testData.get(i) + "\n");
+		writer.write(str.toString());
+		writer.close();
 	}
 
 	public static void main(String[] args) {
@@ -75,6 +93,8 @@ public class SimpleNeuralNetworkDriver {
 			parameters = readParameters(args[0]);
 			trainingData = readData(Integer.parseInt(parameters[2]), Integer.parseInt(parameters[3]), parameters[7]);
 			testData = readData(Integer.parseInt(parameters[2]), Integer.parseInt(parameters[3]), parameters[8]);
+
+			run(parameters, trainingData, testData);
 		} catch (InvalidParameterException e) {
 			System.out.println("Error: " + e.getMessage());
 			return;
@@ -86,6 +106,5 @@ public class SimpleNeuralNetworkDriver {
 			return;
 		}
 
-		run(parameters, trainingData, testData);
 	}
 }

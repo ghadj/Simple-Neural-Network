@@ -1,6 +1,6 @@
 package io.github.ghadj.simpleneuralnetwork;
 
-public class ComputationalNeuron extends Neuron {
+public class SigmoidNeuron extends Neuron {
     private double errorSignal = 0; // δ
 
     private static double sigmoidFunction(double x) {

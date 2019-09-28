@@ -33,13 +33,13 @@ public class NeuralNetwork {
             Layer hiddenLayer = new Layer(layers.get(layers.size() - 1));
             hiddenLayer.addNeuron(new BiasNeuron());
             for (int j = 0; j < numNeuronsPerHiddenLayer.get(i); j++)
-                hiddenLayer.addNeuron(new ComputationalNeuron());
+                hiddenLayer.addNeuron(new SigmoidNeuron());
             layers.add(hiddenLayer);
         }
 
         Layer outputLayer = new Layer(layers.get(layers.size() - 1));
         for (int i = 0; i < numOutputNeurons; i++)
-            outputLayer.addNeuron(new ComputationalNeuron());
+            outputLayer.addNeuron(new SigmoidNeuron());
         layers.add(outputLayer);
     }
 
@@ -74,21 +74,21 @@ public class NeuralNetwork {
     private void forwardpropagation() {
         for (Layer l : layers)
             for (Neuron n : l.getNeurons())
-                if (n instanceof ComputationalNeuron)
-                    ((ComputationalNeuron) n).activate();
+                if (n instanceof SigmoidNeuron)
+                    ((SigmoidNeuron) n).activate();
     }
 
     // δ for output layer neurons
-    private void calculateErrorSignal(ComputationalNeuron n, double target) {
+    private void calculateErrorSignal(SigmoidNeuron n, double target) {
         double errorSignal = SIGMOID_SLOPE * n.getOutput() * (1 - n.getOutput()) * (target - n.getOutput());
         n.setErrorSignal(errorSignal);
     }
 
-    private void calculateErrorSignal(ComputationalNeuron n) {
+    private void calculateErrorSignal(SigmoidNeuron n) {
         double sum = 0;
         // Σ δpk*wp
         for (Synapse s : n.getSynapsesOut())
-            sum += s.getWeight() * ((ComputationalNeuron) s.getNeuronTo()).getErrorSignal();
+            sum += s.getWeight() * ((SigmoidNeuron) s.getNeuronTo()).getErrorSignal();
 
         double errorSignal = SIGMOID_SLOPE * n.getOutput() * (1 - n.getOutput()) * sum;
         n.setErrorSignal(errorSignal);
@@ -98,7 +98,7 @@ public class NeuralNetwork {
         double currentWeight = s.getWeight();
         s.setWeight(
                 s.getWeight()
-                        + LEARNING_RATE * ((ComputationalNeuron) s.getNeuronTo()).getErrorSignal()
+                        + LEARNING_RATE * ((SigmoidNeuron) s.getNeuronTo()).getErrorSignal()
                                 * s.getNeuronFrom().getOutput()
                         + MOMENTUM_FACTOR * (s.getWeight() - s.getPreviousWeight()));
         s.setPreviousWeight(currentWeight);
@@ -109,12 +109,12 @@ public class NeuralNetwork {
         for (int i = layers.size() - 1; i >= 0; i--) {
             Layer l = layers.get(i);
             for (Neuron n : l.getNeurons()) {
-                if (!(n instanceof ComputationalNeuron)) // ignore input/bias units
+                if (!(n instanceof SigmoidNeuron)) // ignore input/bias units
                     continue;
                 if (i == layers.size() - 1) // output layer
-                    calculateErrorSignal((ComputationalNeuron) n, target.get(l.getNeurons().indexOf(n)));
+                    calculateErrorSignal((SigmoidNeuron) n, target.get(l.getNeurons().indexOf(n)));
                 else // hidden layer
-                    calculateErrorSignal((ComputationalNeuron) n);
+                    calculateErrorSignal((SigmoidNeuron) n);
 
                 for (Synapse s : n.getSynapsesIn())
                     changeWeight(s);
