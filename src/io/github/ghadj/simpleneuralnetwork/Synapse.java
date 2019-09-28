@@ -16,7 +16,7 @@ public class Synapse {
 
 	/**
 	 * Constructs a new synapse between the two neurons given. The weight of the
-	 * synapse is initialized to a random number from [-0.5, 0.5].
+	 * synapse is initialized to a random number from [-1, 1].
 	 * 
 	 * @param neuronFrom
 	 * @param NeuronTo
@@ -24,7 +24,7 @@ public class Synapse {
 	public Synapse(Neuron neuronFrom, Neuron NeuronTo) {
 		this.neuronFrom = neuronFrom;
 		this.NeuronTo = NeuronTo;
-		this.weight = (new Random()).nextDouble() - 0.5; // initialize weight
+		this.weight = (new Random()).nextDouble() * 2 - 1; // initialize weight
 		this.previousWeight = this.weight;
 	}
 
