@@ -4,10 +4,39 @@ import java.io.*;
 import java.util.*;
 import java.security.InvalidParameterException;
 
+/**
+ * Driver of the neural network. Takes as input from the arguments the path to
+ * the file, containing the parameters of the neural network. Traings the neural
+ * network based on the given parameters and exports the error and success rate
+ * per epoch in two separate files.
+ * 
+ * Assume that the parameter file has the following format:
+ * mHiddenLayerOneNeurons <integer> 
+ * numHiddenLayerTwoNeurons <integer>
+ * numInputNeurons <integer> 
+ * numOutputNeurons <integer> 
+ * learningRate <double>
+ * momentum <double> 
+ * maxIterations <integer> 
+ * trainFile <path to txt file>
+ * testFile <path to txt file>
+ * 
+ * @author Georgios Hadjiantonis
+ * @since 28-09-2019
+ */
 public class SimpleNeuralNetworkDriver {
 	private static final String errorFilename = "errors.txt";
 	private static final String successRateFilename = "successrate.txt";
 
+	/**
+	 * Reads the parameters of the neural network from the given file.
+	 * 
+	 * @param filename path to the file containing the parameters
+	 * @return a String array containing the parameters.
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws InvalidParameterException
+	 */
 	public static String[] readParameters(String filename)
 			throws FileNotFoundException, IOException, InvalidParameterException {
 		File file = new File(filename);
@@ -26,6 +55,19 @@ public class SimpleNeuralNetworkDriver {
 		return parameters;
 	}
 
+	/**
+	 * Reads data from the given file. Returns a map in the form of <input list,
+	 * output list>.
+	 * 
+	 * @param numInputNeurons  number of input neurons.
+	 * @param numOutputNeurons number of output neurons.
+	 * @param filename         name of file to be read.
+	 * @return a map in the form of <input list, output list>.
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws InvalidParameterException in case the data of the given file is
+	 *                                   inconsistent.
+	 */
 	public static Map<List<Double>, List<Double>> readData(int numInputNeurons, int numOutputNeurons, String filename)
 			throws FileNotFoundException, IOException, InvalidParameterException {
 		Map<List<Double>, List<Double>> data = new HashMap<List<Double>, List<Double>>();
@@ -54,6 +96,16 @@ public class SimpleNeuralNetworkDriver {
 		return data;
 	}
 
+	/**
+	 * Runs the NN based on the parameters, training and testing given data. Writes
+	 * the squares error and success rate to two separate files at the end of all
+	 * the iterations.
+	 * 
+	 * @param parameters
+	 * @param trainingData
+	 * @param testData
+	 * @throws IOException
+	 */
 	public static void run(String[] parameters, Map<List<Double>, List<Double>> trainingData,
 			Map<List<Double>, List<Double>> testData) throws IOException {
 		Integer[] hiddenLayerNeurons = { Integer.parseInt(parameters[0]), Integer.parseInt(parameters[1]) };
@@ -73,11 +125,20 @@ public class SimpleNeuralNetworkDriver {
 		writeResults(trainSuccessRate, testSuccessRate, successRateFilename);
 	}
 
-	public static void writeResults(List<Double> trainData, List<Double> testData, String filename) throws IOException {
+	/**
+	 * Writes the results in a csv format to the file given.
+	 * 
+	 * @param trainResults
+	 * @param testResults
+	 * @param filename
+	 * @throws IOException
+	 */
+	public static void writeResults(List<Double> trainResults, List<Double> testResults, String filename)
+			throws IOException {
 		Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename), "utf-8"));
 		StringBuilder str = new StringBuilder();
-		for (int i = 0; i < trainData.size() && i < testData.size(); i++)
-			str.append((i + 1) + "," + trainData.get(i) + "," + testData.get(i) + "\n");
+		for (int i = 0; i < trainResults.size() && i < testResults.size(); i++)
+			str.append((i + 1) + "," + trainResults.get(i) + "," + testResults.get(i) + "\n");
 		writer.write(str.toString());
 		writer.close();
 	}

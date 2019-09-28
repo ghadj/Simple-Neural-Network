@@ -2,6 +2,12 @@ package io.github.ghadj.simpleneuralnetwork;
 
 import java.util.*;
 
+/**
+ * Implementation of a neural network.
+ * 
+ * @author Georgios Hadjiantonis
+ * @since 28-09-2019
+ */
 public class NeuralNetwork {
     public static final double SIGMOID_SLOPE = 1.0;
     private final double MOMENTUM_FACTOR;
@@ -12,6 +18,18 @@ public class NeuralNetwork {
     private ArrayList<Double> testErrorList = new ArrayList<Double>();
     private ArrayList<Double> testSuccessRate = new ArrayList<Double>();
 
+    /**
+     * Constructs a neural network according to the given parameters. In case of
+     * negative or zero number of input/output neurons throws
+     * IllegalArgumentException exception.
+     * 
+     * @param numInputNeurons          number of input neurons.
+     * @param numOutputNeurons         number of output neurons.
+     * @param numNeuronsPerHiddenLayer list of number of neurons per hidden layer.
+     * @param learningRate             learning rate.
+     * @param momentumFactor           momentum factor.
+     * @throws IllegalArgumentException
+     */
     public NeuralNetwork(int numInputNeurons, int numOutputNeurons, List<Integer> numNeuronsPerHiddenLayer,
             double learningRate, double momentumFactor) throws IllegalArgumentException {
         this.MOMENTUM_FACTOR = momentumFactor;
@@ -43,6 +61,14 @@ public class NeuralNetwork {
         layers.add(outputLayer);
     }
 
+    /**
+     * Runs an NN for an epoch. In case this is a training epoch does backprop.
+     * Keeps mean squared error per epoch and mean success rate per epoch in
+     * separate lists.
+     * 
+     * @param data
+     * @param train true if training epoch.
+     */
     public void run(Map<List<Double>, List<Double>> data, Boolean train) {
         double sumError = 0.0;
         double sumSuccessRate = 0.0;
@@ -63,6 +89,11 @@ public class NeuralNetwork {
         }
     }
 
+    /**
+     * Sets output of the input neurons.
+     * 
+     * @param inputs
+     */
     private void setInputs(List<Double> inputs) {
         int i = 0; // input index
         List<Neuron> inputNeurons = layers.get(0).getNeurons(); // assume only first layer has input units
@@ -71,6 +102,10 @@ public class NeuralNetwork {
                 n.setOutput(inputs.get(i++));
     }
 
+    /**
+     * Performs forward propagation by activating the neurons, starting from the
+     * first layer.
+     */
     private void forwardpropagation() {
         for (Layer l : layers)
             for (Neuron n : l.getNeurons())
@@ -78,12 +113,22 @@ public class NeuralNetwork {
                     ((SigmoidNeuron) n).activate();
     }
 
-    // δ for output layer neurons
+    /**
+     * Calculates and sets error signal(δ) for the output-layer neurons.
+     * 
+     * @param n      neuron.
+     * @param target target output.
+     */
     private void calculateErrorSignal(SigmoidNeuron n, double target) {
         double errorSignal = SIGMOID_SLOPE * n.getOutput() * (1 - n.getOutput()) * (target - n.getOutput());
         n.setErrorSignal(errorSignal);
     }
 
+    /**
+     * Calculates and sets error signal(δ) for the hidden-layer neurons.
+     * 
+     * @param n neuron.
+     */
     private void calculateErrorSignal(SigmoidNeuron n) {
         double sum = 0;
         // Σ δpk*wp
@@ -94,16 +139,26 @@ public class NeuralNetwork {
         n.setErrorSignal(errorSignal);
     }
 
+    /**
+     * Changes the weight of the given synapse according to the learning rate,
+     * momentum factor and error signal specified. Sets previous weight to the
+     * current one.
+     * 
+     * @param s
+     */
     private void changeWeight(Synapse s) {
         double currentWeight = s.getWeight();
-        s.setWeight(
-                s.getWeight()
-                        + LEARNING_RATE * ((SigmoidNeuron) s.getNeuronTo()).getErrorSignal()
-                                * s.getNeuronFrom().getOutput()
-                        + MOMENTUM_FACTOR * (s.getWeight() - s.getPreviousWeight()));
+        s.setWeight(s.getWeight()
+                + LEARNING_RATE * ((SigmoidNeuron) s.getNeuronTo()).getErrorSignal() * s.getNeuronFrom().getOutput()
+                + MOMENTUM_FACTOR * (s.getWeight() - s.getPreviousWeight()));
         s.setPreviousWeight(currentWeight);
     }
 
+    /**
+     * Performs backpropagation using the targer data given.
+     * 
+     * @param target
+     */
     private void backpropagation(List<Double> target) {
         // start from the last layer
         for (int i = layers.size() - 1; i >= 0; i--) {
@@ -122,6 +177,12 @@ public class NeuralNetwork {
         }
     }
 
+    /**
+     * Returns the squared error according to the target data given.
+     * 
+     * @param target
+     * @return squared error according to the target data given.
+     */
     private double getError(List<Double> target) {
         double sum = 0.0;
         List<Neuron> lastLayerNeurons = layers.get(layers.size() - 1).getNeurons();
@@ -131,6 +192,12 @@ public class NeuralNetwork {
         return 0.5 * sum;
     }
 
+    /**
+     * Returns the success rate according to the target data given.
+     * 
+     * @param target
+     * @return success rate according to the target data given.
+     */
     private double getSuccessRate(List<Double> target) {
         double success = 0;
         List<Neuron> lastLayerNeurons = layers.get(layers.size() - 1).getNeurons();
@@ -141,6 +208,11 @@ public class NeuralNetwork {
         return success / target.size();
     }
 
+    /**
+     * Returns string containg some basic info about the NN.
+     * 
+     * @return string containg some basic info about the NN.
+     */
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder("\nNeural Network Info\n");
@@ -151,19 +223,42 @@ public class NeuralNetwork {
         return s.toString();
     }
 
-	public ArrayList<Double> getTrainErrorList() {
-		return trainErrorList;
-	}
+    /**
+     * Returns a list containing the mean of the squared error per epoch, during
+     * training.
+     * 
+     * @return list containing the mean of the squared error per epoch.
+     */
+    public ArrayList<Double> getTrainErrorList() {
+        return trainErrorList;
+    }
 
-	public ArrayList<Double> getTrainSuccessRare() {
-		return trainSuccessRare;
-	}
+    /**
+     * Returns a list containing the mean of success rate per epoch, during
+     * training.
+     * 
+     * @return list containing the mean of the success rate per epoch.
+     */
+    public ArrayList<Double> getTrainSuccessRare() {
+        return trainSuccessRare;
+    }
 
-	public ArrayList<Double> getTestErrorList() {
-		return testErrorList;
-	}
+    /**
+     * Returns a list containing the mean of the squared error per epoch, during
+     * test.
+     * 
+     * @return list containing the mean of the squared error per epoch.
+     */
+    public ArrayList<Double> getTestErrorList() {
+        return testErrorList;
+    }
 
-	public ArrayList<Double> getTestSuccessRate() {
-		return testSuccessRate;
-	}
+    /**
+     * Returns a list containing the mean of success rate per epoch, during test.
+     * 
+     * @return list containing the mean of the success rate per epoch.
+     */
+    public ArrayList<Double> getTestSuccessRate() {
+        return testSuccessRate;
+    }
 }
