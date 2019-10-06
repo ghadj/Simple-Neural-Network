@@ -21,8 +21,14 @@ import java.security.InvalidParameterException;
  * trainFile <path to txt file>
  * testFile <path to txt file>
  * 
+ * Compile from Simple-Neural-Network/ directory
+ * javac -d ./bin ./src/io/github/ghadj/simpleneuralnetwork/*.java
+ * 
+ * Run from Simple-Neural-Network/ directory
+ * java -cp ./bin io.github.ghadj.simpleneuralnetwork.SimpleNeuralNetworkDriver <path to parameters.txt>
+ * 
  * @author Georgios Hadjiantonis
- * @since 28-09-2019
+ * @since 06-10-2019
  */
 public class SimpleNeuralNetworkDriver {
 	private static final String errorFilename = "errors.txt";
@@ -120,13 +126,13 @@ public class SimpleNeuralNetworkDriver {
 		List<Double> testError = nn.getTestErrorList();
 		writeResults(trainError, testError, errorFilename);
 
-		List<Double> trainSuccessRate = nn.getTrainSuccessRare();
+		List<Double> trainSuccessRate = nn.getTrainSuccessRate();
 		List<Double> testSuccessRate = nn.getTestSuccessRate();
 		writeResults(trainSuccessRate, testSuccessRate, successRateFilename);
 	}
 
 	/**
-	 * Writes the results in a csv format to the file given.
+	 * Writes the results in csv format to the file given.
 	 * 
 	 * @param trainResults
 	 * @param testResults
@@ -158,13 +164,10 @@ public class SimpleNeuralNetworkDriver {
 			run(parameters, trainingData, testData);
 		} catch (InvalidParameterException e) {
 			System.out.println("Error: " + e.getMessage());
-			return;
 		} catch (FileNotFoundException e) {
 			System.out.println("Error: " + e.getMessage());
-			return;
 		} catch (IOException e) {
 			System.out.println("Error: " + e.getMessage());
-			return;
 		}
 
 	}

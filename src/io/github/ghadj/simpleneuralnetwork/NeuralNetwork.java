@@ -6,7 +6,7 @@ import java.util.*;
  * Implementation of a neural network.
  * 
  * @author Georgios Hadjiantonis
- * @since 28-09-2019
+ * @since 06-10-2019
  */
 public class NeuralNetwork {
     public static final double SIGMOID_SLOPE = 1.0;
@@ -14,7 +14,7 @@ public class NeuralNetwork {
     private final double LEARNING_RATE;
     private List<Layer> layers = new ArrayList<Layer>();
     private ArrayList<Double> trainErrorList = new ArrayList<Double>();
-    private ArrayList<Double> trainSuccessRare = new ArrayList<Double>();
+    private ArrayList<Double> trainSuccessRate = new ArrayList<Double>();
     private ArrayList<Double> testErrorList = new ArrayList<Double>();
     private ArrayList<Double> testSuccessRate = new ArrayList<Double>();
 
@@ -82,7 +82,7 @@ public class NeuralNetwork {
         }
         if (train) {
             trainErrorList.add(sumError / data.size());
-            trainSuccessRare.add(sumSuccessRate / data.size());
+            trainSuccessRate.add(sumSuccessRate / data.size());
         } else {
             testErrorList.add(sumError / data.size());
             testSuccessRate.add(sumSuccessRate / data.size());
@@ -144,7 +144,7 @@ public class NeuralNetwork {
      * momentum factor and error signal specified. Sets previous weight to the
      * current one.
      * 
-     * @param s
+     * @param s synapse.
      */
     private void changeWeight(Synapse s) {
         double currentWeight = s.getWeight();
@@ -239,8 +239,8 @@ public class NeuralNetwork {
      * 
      * @return list containing the mean of the success rate per epoch.
      */
-    public ArrayList<Double> getTrainSuccessRare() {
-        return trainSuccessRare;
+    public ArrayList<Double> getTrainSuccessRate() {
+        return trainSuccessRate;
     }
 
     /**
